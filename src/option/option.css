@@ -1,0 +1,23 @@
+h3 {
+    color: darkviolet;
+    margin-bottom: 5px;
+    padding: 0 0 3px 0;
+    border-bottom: 3px solid darkviolet;
+}
+
+div {
+    margin-bottom: 5px;
+    padding: 5px 0 5px 5px;
+    border: 1px solid #efefef;
+    border-radius: 5px;
+}
+
+#links-to-recent-pages input[type="radio"] {
+    margin-left: 5px;
+    margin-right: 3px;
+}
+
+.projects input[type="checkbox"] {
+    margin: 0 3px 3px 0;
+}
+

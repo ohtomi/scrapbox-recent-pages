@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="option.css" rel="stylesheet">
+    <title>Scrapbox Recent Pages</title>
+</head>
+<body>
+<h3>Links to recent pages</h3>
+<div id="links-to-recent-pages">
+    <span>Max Links: </span><input type="number" value="30" min="1" max="100"></input>
+    <label><input type="radio" name="link-count-type" value="mixed">All</label>
+    <label><input type="radio" name="link-count-type" value="mixed">Host</label>
+    <label><input type="radio" name="link-count-type" value="mixed">Project</label>
+</div>
+<h3>Projects - https://scrapbox.io</h3>
+<div class="projects" data-host="https://scrapbox.io">
+</div>
+<button id="save">Save</button>
+<script src="option.js"></script>
+</body>
+</html>

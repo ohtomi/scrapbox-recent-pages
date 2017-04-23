@@ -1,0 +1,25 @@
+{
+  "name": "Scrapbox Recent Pages",
+  "description": "Checker for Scrapbox projects",
+  "author": "Kenichi Ohtomi",
+  "version": "0.1.0",
+  "permissions": [
+    "https://scrapbox.io/*/*",
+    "storage",
+    "cookies"
+  ],
+  "background": {
+    "scripts": [
+      "main.js"
+    ],
+    "persistent": false
+  },
+  "options_ui": {
+    "page": "option/option.html",
+    "chrome_style": true
+  },
+  "browser_action": {
+    "default_popup": "popup/popup.html"
+  },
+  "manifest_version": 2
+}
