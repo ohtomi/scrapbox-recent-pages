@@ -5,7 +5,7 @@ h3 {
     border-bottom: 3px solid darkviolet;
 }
 
-div {
+div.panel {
     margin-bottom: 5px;
     padding: 5px 0 5px 5px;
     border: 1px solid #efefef;
@@ -21,3 +21,10 @@ div {
     margin: 0 3px 3px 0;
 }
 
+#add-new-projects input[type="text"] {
+    width: 15rem;
+}
+
+#controller {
+    margin-top: 10px;
+}

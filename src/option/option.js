@@ -1,4 +1,4 @@
-function getAllProjects(baseUrl, containerSelector) {
+function getAllProjects(baseUrl, projectsEl) {
 
     if (baseUrl.substring(baseUrl.length - 1) === '/') {
         baseUrl = baseUrl.substring(0, baseUrl.length - 1);
@@ -7,7 +7,6 @@ function getAllProjects(baseUrl, containerSelector) {
     window.fetch(baseUrl + '/api/projects', {credentials: 'include', mode: 'cors'})
         .then((res) => {
             res.json().then((data) => {
-                var projectsEl = document.querySelector(containerSelector);
                 for (index in data.projects) {
                     var p = data.projects[index];
                     var checkboxEl = document.createElement('input');
@@ -25,6 +24,30 @@ function getAllProjects(baseUrl, containerSelector) {
         .catch((e) => {
             // TODO
         });
+}
+
+function addNewProjectsPanel() {
+
+    var textEl = document.querySelector('#add-new-projects input');
+    if (textEl.value === '') {
+        return;
+    }
+
+    var headingEl = document.createElement('h3');
+    headingEl.textContent = 'Projects - ' + textEl.value;
+
+    var projectsEl = document.createElement('div');
+    projectsEl.classList.add('projects', 'panel');
+    projectsEl.dataset.host = textEl.value;
+
+    var containerEl = document.querySelector('#projects-container');
+    containerEl.appendChild(headingEl);
+    containerEl.appendChild(projectsEl);
+
+    setTimeout(() => {
+        getAllProjects(textEl.value, projectsEl);
+        textEl.value = '';
+    }, 0);
 }
 
 function loadSettings() {
@@ -58,5 +81,7 @@ function saveSettings() {
 }
 
 loadSettings();
-getAllProjects('https://scrapbox.io/', '.projects');
+getAllProjects('https://scrapbox.io/', document.querySelector('.projects'));
+
+document.querySelector('#add').addEventListener('click', addNewProjectsPanel);
 document.querySelector('#save').addEventListener('click', saveSettings);
