@@ -8,10 +8,15 @@
 <body>
 <h3>Links to recent pages</h3>
 <div id="links-to-recent-pages" class="panel">
-    <span>Max Links: </span><input type="number" value="30" min="1" max="100"></input>
-    <label><input type="radio" name="link-count-type" value="mixed" checked>All</label>
-    <label><input type="radio" name="link-count-type" value="mixed">Host</label>
-    <label><input type="radio" name="link-count-type" value="mixed">Project</label>
+    <div>
+        <span>Max Links: </span><input id="max-links" type="number" value="30" min="1" max="100"></input>
+        <label><input type="radio" name="link-count-type" value="total" checked>Total</label>
+        <label><input type="radio" name="link-count-type" value="host">Host</label>
+        <label><input type="radio" name="link-count-type" value="project">Project</label>
+    </div>
+    <div>
+        <span>Check Interval (sec): </span><input id="check-interval-sec" type="number" value="60" min="60" max="3600"></input>
+    </div>
 </div>
 <div id="projects-container">
     <h3>Projects - https://scrapbox.io</h3>
