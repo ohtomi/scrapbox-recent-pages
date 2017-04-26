@@ -1,0 +1,42 @@
+body {
+    min-width: 400px;
+    min-height: 200px;
+    background-color: #efefef;
+}
+
+.menu-item {
+    display: inline-block;
+    line-height: 32px;
+    background-color: lightgrey;
+    color: black;
+    margin-left: 5px;
+    padding: 0 10px;
+    border-radius: 6px 6px 0 0;
+    text-align: center;
+    text-decoration: none;
+}
+
+.menu-item_active {
+    background-color: white;
+}
+
+.menu-content {
+    display: none;
+    min-height: 150px;
+    background-color: white;
+    margin-left: 5px;
+    margin-right: 5px;
+    padding: 5px 5px;
+}
+
+.menu-content_active {
+    display: block;
+}
+
+.menu-content div {
+    margin: 3px 3px;
+}
+
+.menu-content div:hover {
+    background-color: #efefef;
+}
