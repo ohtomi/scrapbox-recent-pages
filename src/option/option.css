@@ -5,7 +5,7 @@ h3 {
     border-bottom: 3px solid darkviolet;
 }
 
-div.panel {
+.panel {
     margin-bottom: 5px;
     padding: 5px 0 5px 5px;
     border: 1px solid #efefef;
@@ -17,7 +17,7 @@ div.panel {
     margin-right: 3px;
 }
 
-.projects input[type="checkbox"] {
+#projects-container input[type="checkbox"] {
     margin: 0 3px 3px 0;
 }
 
