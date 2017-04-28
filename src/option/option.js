@@ -50,37 +50,27 @@ function addNewProjectsPanel() {
     }, 0);
 }
 
-function loadSettings() {
-
-    chrome.storage.sync.get({projects: []}, (settings) => {
-        settings.projects.forEach((setting) => {
-            // TODO
-            console.log(setting);
-        });
-    });
-}
 
 function saveSettings() {
 
-    var settings = {projects: []};
+    var sites = [];
 
     var projectsEls = document.querySelectorAll('.projects');
     projectsEls.forEach((projectsEl) => {
         var host = projectsEl.dataset.host;
-        var setting = {name: host, projects: []};
+        var site = {baseUrl: host, projects: []};
         var checkboxEls = projectsEl.querySelectorAll('input[type="checkbox"]');
         checkboxEls.forEach((checkboxEl) => {
             if (checkboxEl.checked) {
-                setting.projects.push(checkboxEl.value);
+                site.projects.push(checkboxEl.value);
             }
         });
-        settings.projects.push(setting);
+        sites.push(site);
     });
 
-    chrome.storage.sync.set(settings);
+    chrome.extension.getBackgroundPage().updateSites(sites);
 }
 
-loadSettings();
 getAllProjects('https://scrapbox.io/', document.querySelector('.projects'));
 
 document.querySelector('#add').addEventListener('click', addNewProjectsPanel);

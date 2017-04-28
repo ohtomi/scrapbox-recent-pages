@@ -18,6 +18,28 @@ menuItems.forEach((menuItem) => {
 });
 
 setTimeout(() => {
+
+    var recentPagesEl = document.querySelector('#recent-pages');
+    recentPagesEl.innerHTML = '';
+
+    var recentPages = chrome.extension.getBackgroundPage().getRecentPages();
+    recentPages.forEach(site => {
+        var baseUrl = site.baseUrl;
+        var project = site.project;
+        site.pages.forEach(page => {
+
+            var linkEl = document.createElement('a');
+            linkEl.href = baseUrl + '/' + project + '/' + page.title;
+            linkEl.target = '_blank';
+            linkEl.textContent = page.title;
+            var wrapperEl = document.createElement('div');
+            wrapperEl.appendChild(linkEl);
+            recentPagesEl.appendChild(wrapperEl);
+
+        });
+    });
+
     menuItems[0].click();
     menuItems[0].blur();
+
 }, 30);
