@@ -4,7 +4,7 @@ var settings = {
     sites: []
 };
 
-var recentPages = [];
+var fetchCaches = [];
 
 var timer = null;
 
@@ -13,37 +13,36 @@ const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
 function getRecentPages() {
 
-    var pages = [];
+    var result = [];
 
-    recentPages.forEach(p => {
-        p.pages = p.pages.slice(0, settings.maxLinks);
-        pages.push(p);
+    fetchCaches.forEach(cache => {
+        result.push({baseUrl: cache.baseUrl, project: cache.project, pages: cache.pages.slice(0, settings.maxLinks)});
     });
 
-    return pages;
+    return result;
 }
 
 function fetchRecentPages(baseUrl, project, skip, limit) {
 
-    var pages = null;
-    recentPages.forEach(p => {
-        if (p.baseUrl === baseUrl) {
-            pages = p;
+    var cache = null;
+    fetchCaches.forEach(c => {
+        if (c.baseUrl === baseUrl) {
+            cache = c;
         }
     });
 
-    if (!pages) {
-        pages = {baseUrl: baseUrl, project: project, pages: []};
-        recentPages.push(pages);
+    if (!cache) {
+        cache = {baseUrl: baseUrl, project: project, pages: []};
+        fetchCaches.push(cache);
     } else {
-        pages.pages = [];
+        cache.pages = [];
     }
 
     window.fetch(baseUrl + '/api/pages/' + project + '?skip=' + skip + '&sort=updated&limit=' + limit + '&q=', SCRAPBOX_FETCH_OPTIONS)
         .then(res => {
             res.json().then(body => {
 
-                pages.pages = pages.pages.concat(body.pages);
+                cache.pages = cache.pages.concat(body.pages);
                 if (body.skip + body.limit < body.count) {
                     fetchRecentPages(baseUrl, project, skip + limit, limit);
                 } else {
@@ -59,7 +58,6 @@ function fetchRecentPages(baseUrl, project, skip, limit) {
 
 function resetFetchTimer() {
 
-console.log('reset', settings.sites);
     if (timer) {
         clearTimeout(timer);
         timer = null;
@@ -68,7 +66,6 @@ console.log('reset', settings.sites);
     var fetcher = () => {
         settings.sites.forEach(site => {
             site.projects.forEach(project => {
-console.log('fetch!');
                 fetchRecentPages(site.baseUrl, project, 0, SCRAPBOX_FETCH_LIMIT);
             });
         });
