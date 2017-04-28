@@ -92,7 +92,7 @@ function loadSettings() {
 }
 
 function saveSettings() {
-    chrome.storage.sync.set(settings);
+    chrome.storage.sync.set(settings, resetFetchTimer);
 }
 
 function updateMaxLinks(value) {
