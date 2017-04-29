@@ -1,15 +1,47 @@
 # scrapbox-recent-pages
 
-This is a browser extension to watch scrapbox pages.
+This is a browser extension to watch Scrapbox pages.
+
+## Usage
+
+### Recent Pages
+
+This tab shows links to recently updated pages of specified projects.
+
+### Watch Pages
+
+This tab shows links to unread pages that were updated after you had visited.
+
+### Scrapbox Enterprise
+
+To watch Scrapbox Enterprise, configure `src/manifest.json` and `src/main.js`.
+
+```json
+{
+  ...
+  "permissions": [
+    "https://scrapbox.io/*/*",
+    "https://YOUR-HOST/*/*",
+    "storage",
+    "cookies"
+  ],
+  ...
+}
+```
+
+```javascript
+var settings = {
+    ...
+    sites: [
+        {baseUrl: 'https://scrapbox.io', projects: []},
+        {baseUrl: 'https://YOUR-HOST', projects: []}
+    ]
+};
+```
 
 ## Install
-### For users
 
-You can download extension packages from [release page](../../releases/latest).
-
-### For developers
-
-Plase read how to build on below.
+To install, use `Load unpacked extension`.
 
 ## Contributing
 
