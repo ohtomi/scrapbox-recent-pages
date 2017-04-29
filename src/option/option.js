@@ -52,7 +52,35 @@ const addNewProjectsPanel = () => {
     }, 0);
 };
 
+const loadSettings = () => {
+
+    let background = chrome.extension.getBackgroundPage();
+
+    let maxLinks = background.getMaxLinks();
+    let maxLinksEl = document.querySelector(('#max-links'));
+    maxLinksEl.value = maxLinks;
+
+    let checkIntervalSec = background.getCheckIntervalSec();
+    let checkIntervalSecEl = document.querySelector('#check-interval-sec');
+    checkIntervalSecEl.value = checkIntervalSec;
+
+    let sites = background.getSites();
+    // TODO
+};
+
 const saveSettings = () => {
+
+    let background = chrome.extension.getBackgroundPage();
+
+    let maxLinksEl = document.querySelector(('#max-links'));
+    if (maxLinksEl.value) {
+        background.updateMaxLinks(maxLinksEl.value);
+    }
+
+    let checkIntervalSecEl = document.querySelector('#check-interval-sec');
+    if (checkIntervalSecEl.value) {
+        background.updateCheckIntervalSec(checkIntervalSecEl.value);
+    }
 
     let sites = [];
 
@@ -72,6 +100,9 @@ const saveSettings = () => {
     chrome.extension.getBackgroundPage().updateSites(sites);
 };
 
+//
+
+loadSettings();
 getAllProjects('https://scrapbox.io/', document.querySelector('.projects'));
 
 document.querySelector('#add').addEventListener('click', addNewProjectsPanel);

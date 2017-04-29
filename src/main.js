@@ -96,14 +96,26 @@ function saveSettings() {
     chrome.storage.sync.set(settings, resetFetchTimer);
 }
 
+function getMaxLinks() {
+    return settings.maxLinks;
+}
+
 function updateMaxLinks(value) {
     settings.maxLinks = value;
     saveSettings();
 }
 
+function getCheckIntervalSec() {
+    return settings.checkIntervalSec;
+}
+
 function updateCheckIntervalSec(value) {
     settings.checkIntervalSec = value;
     saveSettings();
+}
+
+function getSites() {
+    return settings.sites;
 }
 
 function updateSites(values) {
