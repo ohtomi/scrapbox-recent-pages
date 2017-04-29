@@ -51,7 +51,7 @@ function getRecentPages() {
             .reduce((a, b) => {
                 a.forEach(bag => {
                     if (bag.baseUrl === b.baseUrl) {
-                        bag.items = bag.items.push(b);
+                        bag.items.push(b);
                         return a;
                     }
                 });
@@ -84,30 +84,26 @@ function getRecentPages() {
     }
 }
 
-function fetchRecentPages(baseUrl, project, skip, limit) {
-
-    let cache = null;
-    fetchCaches.forEach(c => {
-        if (c.baseUrl === baseUrl && c.project === project) {
-            cache = c;
-        }
-    });
-
-    if (!cache) {
-        cache = {baseUrl: baseUrl, project: project, pages: []};
-        fetchCaches.push(cache);
-    } else {
-        cache.pages = [];
-    }
+function fetchRecentPages(baseUrl, project, skip, limit, pages) {
 
     window.fetch(baseUrl + '/api/pages/' + project + '?skip=' + skip + '&sort=updated&limit=' + limit + '&q=', SCRAPBOX_FETCH_OPTIONS)
         .then(res => {
             res.json().then(body => {
 
-                cache.pages = cache.pages.concat(body.pages);
                 if (body.skip + body.limit < body.count) {
-                    fetchRecentPages(baseUrl, project, skip + limit, limit);
+                    fetchRecentPages(baseUrl, project, skip + limit, limit, pages.concat(body.pages));
                 } else {
+                    let cache = fetchCaches.find((element, index, array) => {
+                        return element.baseUrl === baseUrl && element.project === project;
+                    });
+
+                    if (cache) {
+                        cache.pages = pages.concat(body.pages);
+                    } else {
+                        cache = {baseUrl: baseUrl, project: project, pages: pages.concat(body.pages)};
+                        fetchCaches.push(cache);
+                    }
+
                     // TODO
                 }
 
@@ -128,7 +124,7 @@ function resetFetchTimer() {
     let fetcher = () => {
         settings.sites.forEach(site => {
             site.projects.forEach(project => {
-                fetchRecentPages(site.baseUrl, project, 0, SCRAPBOX_FETCH_LIMIT);
+                fetchRecentPages(site.baseUrl, project, 0, SCRAPBOX_FETCH_LIMIT, []);
             });
         });
         timer = setTimeout(fetcher, settings.checkIntervalSec * 1000);
