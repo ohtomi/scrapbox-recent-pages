@@ -1,46 +1,48 @@
-function getAllProjects(baseUrl, projectsEl) {
+const getAllProjects = (baseUrl, projectsEl) => {
 
     if (baseUrl.substring(baseUrl.length - 1) === '/') {
         baseUrl = baseUrl.substring(0, baseUrl.length - 1);
     }
 
     window.fetch(baseUrl + '/api/projects', {credentials: 'include', mode: 'cors'})
-        .then((res) => {
-            res.json().then((data) => {
+        .then(res => {
+            res.json().then(data => {
+
                 for (index in data.projects) {
-                    var p = data.projects[index];
-                    var checkboxEl = document.createElement('input');
-                    checkboxEl.type = 'checkbox'
+                    let p = data.projects[index];
+                    let checkboxEl = document.createElement('input');
+                    checkboxEl.type = 'checkbox';
                     checkboxEl.name = 'projects';
                     checkboxEl.value = p.name;
-                    var labelEl = document.createElement('label');
-                    labelEl.appendChild(checkboxEl)
+                    let labelEl = document.createElement('label');
+                    labelEl.appendChild(checkboxEl);
                     labelEl.append(p.displayName);
-                    labelEl.appendChild(document.createElement('br'))
+                    labelEl.appendChild(document.createElement('br'));
                     projectsEl.appendChild(labelEl);
                 }
+
             });
         })
-        .catch((e) => {
+        .catch(e => {
             // TODO
         });
-}
+};
 
-function addNewProjectsPanel() {
+const addNewProjectsPanel = () => {
 
-    var textEl = document.querySelector('#add-new-projects input');
+    let textEl = document.querySelector('#add-new-projects input');
     if (textEl.value === '') {
         return;
     }
 
-    var headingEl = document.createElement('h3');
+    let headingEl = document.createElement('h3');
     headingEl.textContent = 'Projects - ' + textEl.value;
 
-    var projectsEl = document.createElement('div');
+    let projectsEl = document.createElement('div');
     projectsEl.classList.add('projects', 'panel');
     projectsEl.dataset.host = textEl.value;
 
-    var containerEl = document.querySelector('#projects-container');
+    let containerEl = document.querySelector('#projects-container');
     containerEl.appendChild(headingEl);
     containerEl.appendChild(projectsEl);
 
@@ -48,19 +50,18 @@ function addNewProjectsPanel() {
         getAllProjects(textEl.value, projectsEl);
         textEl.value = '';
     }, 0);
-}
+};
 
+const saveSettings = () => {
 
-function saveSettings() {
+    let sites = [];
 
-    var sites = [];
-
-    var projectsEls = document.querySelectorAll('.projects');
+    let projectsEls = document.querySelectorAll('.projects');
     projectsEls.forEach((projectsEl) => {
-        var host = projectsEl.dataset.host;
-        var site = {baseUrl: host, projects: []};
-        var checkboxEls = projectsEl.querySelectorAll('input[type="checkbox"]');
-        checkboxEls.forEach((checkboxEl) => {
+        let host = projectsEl.dataset.host;
+        let site = {baseUrl: host, projects: []};
+        let checkboxEls = projectsEl.querySelectorAll('input[type="checkbox"]');
+        checkboxEls.forEach(checkboxEl => {
             if (checkboxEl.checked) {
                 site.projects.push(checkboxEl.value);
             }
@@ -69,7 +70,7 @@ function saveSettings() {
     });
 
     chrome.extension.getBackgroundPage().updateSites(sites);
-}
+};
 
 getAllProjects('https://scrapbox.io/', document.querySelector('.projects'));
 
