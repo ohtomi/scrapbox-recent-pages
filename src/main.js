@@ -16,16 +16,72 @@ const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
 function getRecentPages() {
 
-    return fetchCaches
-        .map(cache => {
-            return cache.pages.slice(0, settings.maxLinks)
-                .map(page => {
-                    return {baseUrl: cache.baseUrl, project: cache.project, title: page.title};
+    if (settings.linkCountType === 'total') {
+
+        return fetchCaches
+            .map(cache => {
+                return cache.pages.slice(0, settings.maxLinks)
+                    .map(page => {
+                        return {baseUrl: cache.baseUrl, project: cache.project, title: page.title, updated: page.updated};
+                    });
+            })
+            .reduce((a, b) => {
+                return a.concat(b);
+            })
+            .sort((a, b) => {
+                return b.updated - a.updated;
+            })
+            .slice(0, settings.maxLinks);
+
+    } else if (settings.linkCountType === 'host') {
+
+        return fetchCaches
+            .map(cache => {
+                return cache.pages.slice(0, settings.maxLinks)
+                    .map(page => {
+                        return {baseUrl: cache.baseUrl, project: cache.project, title: page.title, updated: page.updated};
+                    });
+            })
+            .reduce((a, b) => {
+                return a.concat(b);
+            })
+            .sort((a, b) => {
+                return b.updated - a.updated;
+            })
+            .reduce((a, b) => {
+                a.forEach(bag => {
+                    if (bag.baseUrl === b.baseUrl) {
+                        bag.items = bag.items.push(b);
+                        return a;
+                    }
                 });
-        })
-        .reduce((a, b) => {
-            return a.concat(b);
-        });
+                a.push({baseUrl: b.baseUrl, items: [b]});
+                return a;
+            }, [])
+            .map(c => {
+                return c.items.slice(0, settings.maxLinks)
+                    .map(item => {
+                        return {baseUrl: item.baseUrl, project: item.project, title: item.title}
+                    });
+            })
+            .reduce((a, b) => {
+                return a.concat(b);
+            });
+
+    } else if (settings.linkCountType === 'project') {
+
+        return fetchCaches
+            .map(cache => {
+                return cache.pages.slice(0, settings.maxLinks)
+                    .map(page => {
+                        return {baseUrl: cache.baseUrl, project: cache.project, title: page.title};
+                    });
+            })
+            .reduce((a, b) => {
+                return a.concat(b);
+            });
+
+    }
 }
 
 function fetchRecentPages(baseUrl, project, skip, limit) {
