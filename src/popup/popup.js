@@ -20,7 +20,8 @@ menuItems.forEach((menuItem) => {
 let recentPagesEl = document.querySelector('#recent-pages');
 recentPagesEl.innerHTML = '';
 
-let recentPages = chrome.extension.getBackgroundPage().getRecentPages();
+let background = chrome.extension.getBackgroundPage();
+let recentPages = background.getRecentPages();
 recentPages.forEach(page => {
 
     let linkEl = document.createElement('a');
