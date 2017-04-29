@@ -26,7 +26,7 @@ function fetchRecentPages(baseUrl, project, skip, limit) {
 
     var cache = null;
     fetchCaches.forEach(c => {
-        if (c.baseUrl === baseUrl) {
+        if (c.baseUrl === baseUrl && c.project === project) {
             cache = c;
         }
     });
@@ -72,6 +72,7 @@ function resetFetchTimer() {
         timer = setTimeout(fetcher, settings.checkIntervalSec * 1000);
     };
 
+    fetchCaches = [];
     fetcher();
 }
 
