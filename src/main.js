@@ -19,7 +19,9 @@ function getRecentPages() {
     var result = [];
 
     fetchCaches.forEach(cache => {
-        result.push({baseUrl: cache.baseUrl, project: cache.project, pages: cache.pages.slice(0, settings.maxLinks)});
+        cache.pages.slice(0, settings.maxLinks).forEach(page => {
+            result.push({baseUrl: cache.baseUrl, project: cache.project, title: page.title});
+        });
     });
 
     return result;
