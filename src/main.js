@@ -16,15 +16,16 @@ const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
 function getRecentPages() {
 
-    let result = [];
-
-    fetchCaches.forEach(cache => {
-        cache.pages.slice(0, settings.maxLinks).forEach(page => {
-            result.push({baseUrl: cache.baseUrl, project: cache.project, title: page.title});
+    return fetchCaches
+        .map(cache => {
+            return cache.pages.slice(0, settings.maxLinks)
+                .map(page => {
+                    return {baseUrl: cache.baseUrl, project: cache.project, title: page.title};
+                });
+        })
+        .reduce((a, b) => {
+            return a.concat(b);
         });
-    });
-
-    return result;
 }
 
 function fetchRecentPages(baseUrl, project, skip, limit) {
