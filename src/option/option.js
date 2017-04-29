@@ -28,27 +28,21 @@ const getAllProjects = (baseUrl, projectsEl) => {
         });
 };
 
-const addNewProjectsPanel = () => {
-
-    let textEl = document.querySelector('#add-new-projects input');
-    if (textEl.value === '') {
-        return;
-    }
+const addNewProjectsPanel = (baseUrl, projects) => {
 
     let headingEl = document.createElement('h3');
-    headingEl.textContent = 'Projects - ' + textEl.value;
+    headingEl.textContent = 'Projects - ' + baseUrl;
 
     let projectsEl = document.createElement('div');
     projectsEl.classList.add('projects', 'panel');
-    projectsEl.dataset.host = textEl.value;
+    projectsEl.dataset.host = baseUrl;
 
     let containerEl = document.querySelector('#projects-container');
     containerEl.appendChild(headingEl);
     containerEl.appendChild(projectsEl);
 
     setTimeout(() => {
-        getAllProjects(textEl.value, projectsEl);
-        textEl.value = '';
+        getAllProjects(baseUrl, projectsEl);
     }, 0);
 };
 
@@ -65,7 +59,9 @@ const loadSettings = () => {
     checkIntervalSecEl.value = checkIntervalSec;
 
     let sites = background.getSites();
-    // TODO
+    sites.forEach(site => {
+        addNewProjectsPanel(site.baseUrl, site.projects);
+    });
 };
 
 const saveSettings = () => {
@@ -97,13 +93,12 @@ const saveSettings = () => {
         sites.push(site);
     });
 
-    chrome.extension.getBackgroundPage().updateSites(sites);
+    if (sites.length) {
+        background.updateSites(sites);
+    }
 };
 
 //
 
 loadSettings();
-getAllProjects('https://scrapbox.io/', document.querySelector('.projects'));
-
-document.querySelector('#add').addEventListener('click', addNewProjectsPanel);
 document.querySelector('#save').addEventListener('click', saveSettings);

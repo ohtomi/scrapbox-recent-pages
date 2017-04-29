@@ -1,7 +1,9 @@
 var settings = {
     maxLinks: 30,
     checkIntervalSec: 60,
-    sites: []
+    sites: [
+        {baseUrl: 'https://scrapbox.io', projects: []}
+    ]
 };
 
 var fetchCaches = [];
