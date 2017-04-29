@@ -1,4 +1,4 @@
-var settings = {
+let settings = {
     maxLinks: 30,
     linkCountType: 'total',
     checkIntervalSec: 60,
@@ -7,16 +7,16 @@ var settings = {
     ]
 };
 
-var fetchCaches = [];
+let fetchCaches = [];
 
-var timer = null;
+let timer = null;
 
 const SCRAPBOX_FETCH_LIMIT = 300;
 const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
 function getRecentPages() {
 
-    var result = [];
+    let result = [];
 
     fetchCaches.forEach(cache => {
         cache.pages.slice(0, settings.maxLinks).forEach(page => {
@@ -29,7 +29,7 @@ function getRecentPages() {
 
 function fetchRecentPages(baseUrl, project, skip, limit) {
 
-    var cache = null;
+    let cache = null;
     fetchCaches.forEach(c => {
         if (c.baseUrl === baseUrl && c.project === project) {
             cache = c;
@@ -68,7 +68,7 @@ function resetFetchTimer() {
         timer = null;
     }
 
-    var fetcher = () => {
+    let fetcher = () => {
         settings.sites.forEach(site => {
             site.projects.forEach(project => {
                 fetchRecentPages(site.baseUrl, project, 0, SCRAPBOX_FETCH_LIMIT);

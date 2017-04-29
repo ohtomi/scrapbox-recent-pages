@@ -1,8 +1,8 @@
-var menuItems = document.querySelectorAll('.menu-item');
+let menuItems = document.querySelectorAll('.menu-item');
 menuItems.forEach((menuItem) => {
     menuItem.addEventListener('click', () => {
-        var target = menuItem.dataset.menuContent;
-        var menuContents = document.querySelectorAll('.menu-content');
+        let target = menuItem.dataset.menuContent;
+        let menuContents = document.querySelectorAll('.menu-content');
         menuContents.forEach((menuContent) => {
             menuContent.classList.remove('menu-content_active');
             if (menuContent.id === target) {
@@ -17,25 +17,23 @@ menuItems.forEach((menuItem) => {
     });
 });
 
+let recentPagesEl = document.querySelector('#recent-pages');
+recentPagesEl.innerHTML = '';
+
+let recentPages = chrome.extension.getBackgroundPage().getRecentPages();
+recentPages.forEach(page => {
+
+    let linkEl = document.createElement('a');
+    linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
+    linkEl.target = '_blank';
+    linkEl.textContent = page.title;
+    let wrapperEl = document.createElement('div');
+    wrapperEl.appendChild(linkEl);
+    recentPagesEl.appendChild(wrapperEl);
+
+});
+
 setTimeout(() => {
-
-    var recentPagesEl = document.querySelector('#recent-pages');
-    recentPagesEl.innerHTML = '';
-
-    var recentPages = chrome.extension.getBackgroundPage().getRecentPages();
-    recentPages.forEach(page => {
-
-        var linkEl = document.createElement('a');
-        linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
-        linkEl.target = '_blank';
-        linkEl.textContent = page.title;
-        var wrapperEl = document.createElement('div');
-        wrapperEl.appendChild(linkEl);
-        recentPagesEl.appendChild(wrapperEl);
-
-    });
-
     menuItems[0].click();
     menuItems[0].blur();
-
 }, 30);
