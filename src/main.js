@@ -1,5 +1,6 @@
 var settings = {
     maxLinks: 30,
+    linkCountType: 'total',
     checkIntervalSec: 60,
     sites: [
         {baseUrl: 'https://scrapbox.io', projects: []}
@@ -104,6 +105,15 @@ function getMaxLinks() {
 
 function updateMaxLinks(value) {
     settings.maxLinks = value;
+    saveSettings();
+}
+
+function getLinkCountType() {
+    return settings.linkCountType;
+}
+
+function updateLinkCountType(value) {
+    settings.linkCountType = value;
     saveSettings();
 }
 

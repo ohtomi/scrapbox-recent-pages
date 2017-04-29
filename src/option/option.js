@@ -54,6 +54,14 @@ const loadSettings = () => {
     let maxLinksEl = document.querySelector(('#max-links'));
     maxLinksEl.value = maxLinks;
 
+    let linkCountType = background.getLinkCountType();
+    let linkCountTypeEls = document.querySelectorAll('input[name="link-count-type"]');
+    linkCountTypeEls.forEach(linkCountTypeEl => {
+        if (linkCountTypeEl.value === linkCountType) {
+            linkCountTypeEl.checked = true;
+        }
+    });
+
     let checkIntervalSec = background.getCheckIntervalSec();
     let checkIntervalSecEl = document.querySelector('#check-interval-sec');
     checkIntervalSecEl.value = checkIntervalSec;
@@ -72,6 +80,13 @@ const saveSettings = () => {
     if (maxLinksEl.value) {
         background.updateMaxLinks(maxLinksEl.value);
     }
+
+    let linkCountTypeEls = document.querySelectorAll('input[name="link-count-type"]');
+    linkCountTypeEls.forEach(linkCountTypeEl => {
+        if (linkCountTypeEl.checked) {
+            background.updateLinkCountType(linkCountTypeEl.value);
+        }
+    });
 
     let checkIntervalSecEl = document.querySelector('#check-interval-sec');
     if (checkIntervalSecEl.value) {
