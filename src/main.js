@@ -14,13 +14,17 @@ let timer = null;
 const SCRAPBOX_FETCH_LIMIT = 300;
 const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
-function getRecentPages() {
+function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
 
-    if (settings.linkCountType === 'total') {
+    if (fetchCaches.length === 0) {
+        return [];
+    }
+
+    if (linkCountType === 'total') {
 
         return fetchCaches
             .map(cache => {
-                return cache.pages.slice(0, settings.maxLinks)
+                return cache.pages.slice(0, maxLinks)
                     .map(page => {
                         return {baseUrl: cache.baseUrl, project: cache.project, title: page.title, updated: page.updated};
                     });
@@ -31,13 +35,13 @@ function getRecentPages() {
             .sort((a, b) => {
                 return b.updated - a.updated;
             })
-            .slice(0, settings.maxLinks);
+            .slice(0, maxLinks);
 
-    } else if (settings.linkCountType === 'host') {
+    } else if (linkCountType === 'host') {
 
         return fetchCaches
             .map(cache => {
-                return cache.pages.slice(0, settings.maxLinks)
+                return cache.pages.slice(0, maxLinks)
                     .map(page => {
                         return {baseUrl: cache.baseUrl, project: cache.project, title: page.title, updated: page.updated};
                     });
@@ -49,17 +53,20 @@ function getRecentPages() {
                 return b.updated - a.updated;
             })
             .reduce((a, b) => {
-                a.forEach(bag => {
-                    if (bag.baseUrl === b.baseUrl) {
-                        bag.items.push(b);
-                        return a;
-                    }
+                let bag = a.find((element, index, array) => {
+                    return element.baseUrl === b.baseUrl;
                 });
-                a.push({baseUrl: b.baseUrl, items: [b]});
+
+                if (bag) {
+                    bag.items.push(b);
+                } else {
+                    bag = {baseUrl: b.baseUrl, items: [b]};
+                    a.push(bag);
+                }
                 return a;
             }, [])
             .map(c => {
-                return c.items.slice(0, settings.maxLinks)
+                return c.items.slice(0, maxLinks)
                     .map(item => {
                         return {baseUrl: item.baseUrl, project: item.project, title: item.title}
                     });
@@ -68,11 +75,11 @@ function getRecentPages() {
                 return a.concat(b);
             });
 
-    } else if (settings.linkCountType === 'project') {
+    } else if (linkCountType === 'project') {
 
         return fetchCaches
             .map(cache => {
-                return cache.pages.slice(0, settings.maxLinks)
+                return cache.pages.slice(0, maxLinks)
                     .map(page => {
                         return {baseUrl: cache.baseUrl, project: cache.project, title: page.title};
                     });
@@ -82,6 +89,10 @@ function getRecentPages() {
             });
 
     }
+}
+
+function getRecentPages() {
+    return filterRecentPages(fetchCaches, settings.maxLinks, settings.linkCountType);
 }
 
 function fetchRecentPages(baseUrl, project, skip, limit, pages) {
@@ -192,4 +203,6 @@ function updateSites(values) {
 
 //
 
-loadSettings();
+if (chrome.storage) {
+    loadSettings();
+}
