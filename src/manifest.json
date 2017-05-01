@@ -5,6 +5,7 @@
   "version": "0.1.0",
   "permissions": [
     "https://scrapbox.io/*/*",
+    "contextMenus",
     "storage",
     "cookies"
   ],
@@ -14,6 +15,16 @@
     ],
     "persistent": true
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://scrapbox.io/*"
+      ],
+      "js": [
+        "content/content.js"
+      ]
+    }
+  ],
   "options_ui": {
     "page": "option/option.html",
     "chrome_style": true
