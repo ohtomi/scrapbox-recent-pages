@@ -11,6 +11,8 @@
   ],
   "background": {
     "scripts": [
+      "settings.js",
+      "fetcher.js",
       "main.js"
     ],
     "persistent": true

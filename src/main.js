@@ -1,12 +1,5 @@
-let settings = {
-    maxLinks: 30,
-    linkCountType: 'total',
-    checkIntervalSec: 60,
-    sites: [
-        {baseUrl: 'https://scrapbox.io', projects: []}
-    ],
-    watches: []
-};
+let settings = null;
+let fetchers = [];
 
 //
 
@@ -32,10 +25,9 @@ function createContextMenu() {
         }
     });
 
-    let contextMenuAvailableUrlPatterns = settings.sites
-        .map(site => {
-            return site.baseUrl + '/*/*';
-        });
+    let contextMenuAvailableUrlPatterns = settings.sites.map(site => {
+        return site.baseUrl + '/*/*';
+    });
 
     chrome.contextMenus.create({
         id: 'watch-this-page',
@@ -72,14 +64,6 @@ function createContextMenu() {
 }
 
 //
-
-let fetchCaches = [];
-let watchCaches = [];
-
-let timer = null;
-
-const SCRAPBOX_FETCH_LIMIT = 300;
-const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
 function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
 
@@ -154,113 +138,80 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
     }
 }
 
+let watchCaches = [];
+
 function getRecentPages() {
-    return filterRecentPages(fetchCaches, settings.maxLinks, settings.linkCountType);
-}
+    let fetchCaches = fetchers.map(fetcher => {
 
-function fetchRecentPages(baseUrl, project, skip, limit, pages) {
-
-    window.fetch(baseUrl + '/api/pages/' + project + '?skip=' + skip + '&sort=updated&limit=' + limit + '&q=', SCRAPBOX_FETCH_OPTIONS)
-        .then(res => {
-            res.json().then(body => {
-
-                if (body.skip + body.limit < body.count) {
-                    fetchRecentPages(baseUrl, project, skip + limit, limit, pages.concat(body.pages));
-                } else {
-                    let cache = fetchCaches.find((element, index, array) => {
-                        return element.baseUrl === baseUrl && element.project === project;
-                    });
-
-                    if (cache) {
-                        cache.pages = pages.concat(body.pages);
-                    } else {
-                        cache = {baseUrl: baseUrl, project: project, pages: pages.concat(body.pages)};
-                        fetchCaches.push(cache);
-                    }
-
-                    cache.pages.forEach(page => {
-                        let watch = settings.watches.find((element, index, array) => {
-                            return element.baseUrl === baseUrl && element.project === project && element.title === page.title;
-                        });
-                        if (!watch) {
-                            return;
-                        }
-
-                        let wcache = watchCaches.find((element, index, array) => {
-                            return element.baseUrl === baseUrl && element.project === project && element.pages.length === 1 && element.pages[0].title === page.title;
-                        });
-
-                        if (watch.accessed < page.updated) {
-                            if (!wcache) {
-                                wcache = {baseUrl: baseUrl, project: project, pages: [page]};
-                                watchCaches.push(wcache);
-                            } else {
-                                wcache.pages = [page];
-                            }
-                        } else {
-                            if (wcache) {
-                                watchCaches = watchCaches.filter((element, index, array) => {
-                                    return element.baseUrl !== wcache.baseUrl || element.project !== wcache.project || element.pages.length !== 1 || element.pages[0].title !== wcache.pages[0].title;
-                                })
-                            }
-                        }
-                    });
-
-                    if (watchCaches.length) {
-                        chrome.browserAction.setBadgeText({text: watchCaches.length + ''});
-                    } else {
-                        chrome.browserAction.setBadgeText({text: ''});
-                    }
-                }
-
+        // TODO
+        fetcher.cache.forEach(page => {
+            let watch = settings.watches.find((element, index, array) => {
+                return element.baseUrl === baseUrl && element.project === project && element.title === page.title;
             });
-        })
-        .catch(e => {
-            // TODO
+            if (!watch) {
+                return;
+            }
+
+            let wcache = watchCaches.find((element, index, array) => {
+                return element.baseUrl === baseUrl && element.project === project && element.pages.length === 1 && element.pages[0].title === page.title;
+            });
+
+            if (watch.accessed < page.updated) {
+                if (!wcache) {
+                    wcache = {baseUrl: baseUrl, project: project, pages: [page]};
+                    watchCaches.push(wcache);
+                } else {
+                    wcache.pages = [page];
+                }
+            } else {
+                if (wcache) {
+                    watchCaches = watchCaches.filter((element, index, array) => {
+                        return element.baseUrl !== wcache.baseUrl || element.project !== wcache.project || element.pages.length !== 1 || element.pages[0].title !== wcache.pages[0].title;
+                    })
+                }
+            }
         });
+
+        if (watchCaches.length) {
+            chrome.browserAction.setBadgeText({text: watchCaches.length + ''});
+        } else {
+            chrome.browserAction.setBadgeText({text: ''});
+        }
+
+        return {baseUrl: fetcher.baseUrl, project: fetcher.project, pages: fetcher.cache};
+    });
+    return filterRecentPages(fetchCaches, settings.maxLinks, settings.linkCountType);
 }
 
 function resetFetchTimer() {
 
-    if (timer) {
-        clearTimeout(timer);
-        timer = null;
-    }
+    settings.sites.forEach(site => {
+        site.projects.forEach(project => {
 
-    let fetcher = () => {
-        settings.sites.forEach(site => {
-            site.projects.forEach(project => {
-                fetchRecentPages(site.baseUrl, project, 0, SCRAPBOX_FETCH_LIMIT, []);
+            let fetcher = fetchers.find((element, index, array) => {
+                return element.baseUrl === site.baseUrl && element.project === project;
             });
+
+            if (fetcher) {
+                fetcher.stop();
+                fetcher.doFetch(0, 300, []); // TODO
+            } else {
+                fetcher = Fetcher.start(site.baseUrl, project, settings.checkIntervalSec);
+                fetchers.push(fetcher);
+            }
         });
-        timer = setTimeout(fetcher, settings.checkIntervalSec * 1000);
-    };
-
-    fetchCaches = [];
-    fetcher();
-}
-
-function loadSettings() {
-
-    chrome.storage.sync.get({}, (current) => {
-        settings.maxLinks = current.maxLinks || settings.maxLinks;
-        settings.checkIntervalSec = current.checkIntervalSec || settings.checkIntervalSec;
-
-        if (current.sites) {
-            current.sites.forEach(site => {
-                settings.sites[site.baseUrl] = site.projects;
-            });
-        }
-
-        settings.watches = current.watches || settings.watches;
-
-        resetFetchTimer();
-        createContextMenu();
     });
 }
 
-function saveSettings() {
-    chrome.storage.sync.set(settings, resetFetchTimer);
+async function loadSettings() {
+    settings = await Settings.load();
+    resetFetchTimer();
+    createContextMenu();
+}
+
+async function saveSettings() {
+    await settings.save();
+    resetFetchTimer();
 }
 
 function getMaxLinks() {
