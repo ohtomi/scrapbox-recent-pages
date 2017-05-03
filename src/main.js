@@ -192,9 +192,7 @@ function getRecentPages() {
                 chrome.browserAction.setBadgeText({text: ''});
             }
 
-            return fetcher.cache.map(page => {
-                return {baseUrl: fetcher.baseUrl, project: fetcher.project, title: page.title, image: page.image, updated: page.updated};
-            });
+            return fetcher.cache;
         })
         .reduce((a, b) => {
             return a.concat(b);

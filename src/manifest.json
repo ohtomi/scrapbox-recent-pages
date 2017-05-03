@@ -12,6 +12,7 @@
   "background": {
     "scripts": [
       "settings.js",
+      "page.js",
       "fetcher.js",
       "main.js"
     ],

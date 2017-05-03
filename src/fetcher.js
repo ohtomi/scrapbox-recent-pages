@@ -44,7 +44,10 @@ class Fetcher {
                             this.doFetch(skip + limit, limit, pages.concat(body.pages));
                         } else {
                             this._fetching = false;
-                            this.cache = pages.concat(body.pages);
+                            this.cache = pages.concat(body.pages)
+                                .map(page => {
+                                    return new PageMetadata(this.baseUrl, this.project, page.title, page.image, page.updated);
+                                });
                             this.error = null;
                         }
                     });
