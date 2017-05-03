@@ -247,6 +247,8 @@ function addWatch(value) {
     if (!exist) {
         settings.watches.push(value);
         settings.save();
+
+        watcher.doWatch();
     }
 }
 
@@ -260,6 +262,8 @@ function deleteWatch(value) {
             return element.baseUrl !== value.baseUrl || element.project !== value.project || element.title !== value.title;
         });
         settings.save();
+
+        watcher.doWatch();
     }
 }
 
@@ -271,6 +275,8 @@ function notifyWatchPageAccessed(baseUrl, project, title, accessed) {
     if (exist) {
         exist.accessed = accessed;
         settings.save();
+
+        watcher.doWatch();
     }
 }
 

@@ -17,10 +17,11 @@ menuItems.forEach((menuItem) => {
     });
 });
 
+let background = chrome.extension.getBackgroundPage();
+
 let recentPagesEl = document.querySelector('#recent-pages');
 recentPagesEl.innerHTML = '';
 
-let background = chrome.extension.getBackgroundPage();
 let recentPages = background.getRecentPages();
 recentPages.forEach(page => {
 
@@ -28,6 +29,9 @@ recentPages.forEach(page => {
     linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
     linkEl.target = '_blank';
     linkEl.textContent = page.title;
+    linkEl.onclick = () => {
+        background.notifyWatchPageAccessed(page.baseUrl, page.project, page.title, new Date().getTime() / 1000);
+    };
     let wrapperEl = document.createElement('div');
     wrapperEl.appendChild(linkEl);
     recentPagesEl.appendChild(wrapperEl);
@@ -44,6 +48,9 @@ watchPages.forEach(page => {
     linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
     linkEl.target = '_blank';
     linkEl.textContent = page.title;
+    linkEl.onclick = () => {
+        background.notifyWatchPageAccessed(page.baseUrl, page.project, page.title, new Date().getTime() / 1000);
+    };
     let wrapperEl = document.createElement('div');
     wrapperEl.appendChild(linkEl);
     watchPagesEl.appendChild(wrapperEl);
