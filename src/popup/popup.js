@@ -34,6 +34,22 @@ recentPages.forEach(page => {
 
 });
 
+let watchPagesEl = document.querySelector('#watch-pages');
+watchPagesEl.innerHTML = '';
+
+let watchPages = background.getWatchPages();
+watchPages.forEach(page => {
+
+    let linkEl = document.createElement('a');
+    linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
+    linkEl.target = '_blank';
+    linkEl.textContent = page.title;
+    let wrapperEl = document.createElement('div');
+    wrapperEl.appendChild(linkEl);
+    watchPagesEl.appendChild(wrapperEl);
+
+});
+
 setTimeout(() => {
     menuItems[0].click();
     menuItems[0].blur();
