@@ -3,7 +3,7 @@ let fetchers = [];
 
 //
 
-function createContextMenu() {
+const createContextMenu = () => {
     chrome.contextMenus.onClicked.addListener((info, tab) => {
         let targetUrl = new URL(info.pageUrl);
         let pathnameTokens = targetUrl.pathname.split('/');
@@ -61,7 +61,24 @@ function createContextMenu() {
 
         notifyWatchPageAccessed(baseUrl, project, title, accessed);
     });
-}
+};
+
+const resetFetchTimer = () => {
+
+    fetchers.forEach(fetcher => {
+        fetcher.stop();
+    });
+
+    fetchers = [];
+
+    settings.sites.forEach(site => {
+        site.projects.forEach(project => {
+            let fetcher = new Fetcher(site.baseUrl, project, settings.checkIntervalSec);
+            fetcher.start();
+            fetchers.push(fetcher);
+        });
+    });
+};
 
 //
 
@@ -183,41 +200,13 @@ function getRecentPages() {
     return filterRecentPages(fetchCaches, settings.maxLinks, settings.linkCountType);
 }
 
-function resetFetchTimer() {
-
-    fetchers.forEach(fetcher => {
-        fetcher.stop();
-    });
-
-    fetchers = [];
-
-    settings.sites.forEach(site => {
-        site.projects.forEach(project => {
-            let fetcher = new Fetcher(site.baseUrl, project, settings.checkIntervalSec);
-            fetcher.start();
-            fetchers.push(fetcher);
-        });
-    });
-}
-
-async function loadSettings() {
-    settings = await Settings.load();
-    resetFetchTimer();
-    createContextMenu();
-}
-
-async function saveSettings() {
-    await settings.save();
-    resetFetchTimer();
-}
-
 function getMaxLinks() {
     return settings.maxLinks;
 }
 
 function updateMaxLinks(value) {
     settings.maxLinks = value;
-    saveSettings();
+    settings.save();
 }
 
 function getLinkCountType() {
@@ -226,7 +215,7 @@ function getLinkCountType() {
 
 function updateLinkCountType(value) {
     settings.linkCountType = value;
-    saveSettings();
+    settings.save();
 }
 
 function getCheckIntervalSec() {
@@ -235,7 +224,9 @@ function getCheckIntervalSec() {
 
 function updateCheckIntervalSec(value) {
     settings.checkIntervalSec = value;
-    saveSettings();
+    settings.save().then(() => {
+        resetFetchTimer();
+    })
 }
 
 function getSites() {
@@ -244,7 +235,9 @@ function getSites() {
 
 function updateSites(values) {
     settings.sites = values;
-    saveSettings();
+    settings.save().then(() => {
+        resetFetchTimer();
+    })
 }
 
 function getWatches() {
@@ -258,7 +251,7 @@ function addWatch(value) {
 
     if (!exist) {
         settings.watches.push(value);
-        saveSettings();
+        settings.save();
     }
 }
 
@@ -271,7 +264,7 @@ function deleteWatch(value) {
         settings.watches = settings.watches.filter((element, index, array) => {
             return element.baseUrl !== value.baseUrl || element.project !== value.project || element.title !== value.title;
         });
-        saveSettings();
+        settings.save();
     }
 }
 
@@ -282,12 +275,16 @@ function notifyWatchPageAccessed(baseUrl, project, title, accessed) {
 
     if (exist) {
         exist.accessed = accessed;
-        saveSettings();
+        settings.save();
     }
 }
 
 //
 
 if (chrome) {
-    loadSettings();
+    Settings.load().then(s => {
+        settings = s;
+        resetFetchTimer();
+        createContextMenu();
+    });
 }
