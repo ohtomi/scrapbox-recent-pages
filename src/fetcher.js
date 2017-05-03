@@ -12,6 +12,10 @@ class Fetcher {
         this._fetching = false;
         this.cache = [];
         this.error = null;
+
+        if (this.baseUrl.substring(this.baseUrl.length - 1) === '/') {
+            this.baseUrl = this.baseUrl.substring(0, this.baseUrl.length - 1);
+        }
     }
 
     start() {
