@@ -1,5 +1,6 @@
 let settings = null;
 let fetchers = [];
+let watcher = null;
 
 //
 
@@ -78,19 +79,40 @@ const resetFetchTimer = () => {
             fetchers.push(fetcher);
         });
     });
+
+    if (watcher) {
+        watcher.stop();
+    }
+
+    watcher = new Watcher(
+        () => {
+            return settings.watches;
+        },
+        () => {
+            return fetchers;
+        },
+        (count) => {
+            if (count) {
+                chrome.browserAction.setBadgeText({text: count + ''});
+            } else {
+                chrome.browserAction.setBadgeText({text: ''});
+            }
+        },
+        settings.checkIntervalSec / 2);
+    watcher.start();
 };
 
 //
 
-function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
+function filterRecentPages(allPages, maxLinks, linkCountType) {
 
-    if (fetchCaches.length === 0) {
+    if (allPages.length === 0) {
         return [];
     }
 
     if (linkCountType === 'total') {
 
-        return fetchCaches
+        return allPages
             .sort((a, b) => {
                 return b.updated - a.updated;
             })
@@ -98,7 +120,7 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
 
     } else if (linkCountType === 'host') {
 
-        return fetchCaches
+        return allPages
             .reduce((hosts, cache) => {
                 let host = hosts.find((element, index, array) => {
                     return element.baseUrl === cache.baseUrl;
@@ -124,7 +146,7 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
 
     } else if (linkCountType === 'project') {
 
-        return fetchCaches
+        return allPages
             .reduce((projects, cache) => {
                 let project = projects.find((element, index, array) => {
                     return element.baseUrl === cache.baseUrl && element.project === cache.project;
@@ -151,53 +173,22 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
     }
 }
 
-let watchCaches = [];
-
 function getRecentPages() {
-    let fetchCaches = fetchers
+    let allPages = fetchers
         .map(fetcher => {
-
-            // TODO
-            fetcher.cache.forEach(page => {
-                let watch = settings.watches.find((element, index, array) => {
-                    return element.baseUrl === baseUrl && element.project === project && element.title === page.title;
-                });
-                if (!watch) {
-                    return;
-                }
-
-                let wcache = watchCaches.find((element, index, array) => {
-                    return element.baseUrl === baseUrl && element.project === project && element.pages.length === 1 && element.pages[0].title === page.title;
-                });
-
-                if (watch.accessed < page.updated) {
-                    if (!wcache) {
-                        wcache = {baseUrl: baseUrl, project: project, pages: [page]};
-                        watchCaches.push(wcache);
-                    } else {
-                        wcache.pages = [page];
-                    }
-                } else {
-                    if (wcache) {
-                        watchCaches = watchCaches.filter((element, index, array) => {
-                            return element.baseUrl !== wcache.baseUrl || element.project !== wcache.project || element.pages.length !== 1 || element.pages[0].title !== wcache.pages[0].title;
-                        })
-                    }
-                }
-            });
-
-            if (watchCaches.length) {
-                chrome.browserAction.setBadgeText({text: watchCaches.length + ''});
-            } else {
-                chrome.browserAction.setBadgeText({text: ''});
-            }
-
             return fetcher.cache;
         })
         .reduce((a, b) => {
             return a.concat(b);
         });
-    return filterRecentPages(fetchCaches, settings.maxLinks, settings.linkCountType);
+    return filterRecentPages(allPages, settings.maxLinks, settings.linkCountType);
+}
+
+function getWatchPages() {
+    return watcher.cache
+        .sort((a, b) => {
+            return b.updated - a.updated;
+        });
 }
 
 function getMaxLinks() {
