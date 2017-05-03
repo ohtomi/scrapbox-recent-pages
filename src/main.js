@@ -104,6 +104,10 @@ const resetFetchTimer = () => {
 
 //
 
+async function getAllProjects(baseUrl) {
+    return FetcherUtils.fetchAllProjects(baseUrl);
+}
+
 function filterRecentPages(allPages, maxLinks, linkCountType) {
 
     if (allPages.length === 0) {

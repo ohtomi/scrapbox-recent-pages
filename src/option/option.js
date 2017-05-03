@@ -1,12 +1,12 @@
 const getAllProjects = (baseUrl, projectsEl) => {
 
-    if (baseUrl.substring(baseUrl.length - 1) === '/') {
-        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
-    }
+    let background = chrome.extension.getBackgroundPage();
 
-    window.fetch(baseUrl + '/api/projects', {credentials: 'include', mode: 'cors'})
+    background.getAllProjects(baseUrl)
         .then(res => {
             res.json().then(data => {
+
+                projectsEl.innerHTML = '';
 
                 for (index in data.projects) {
                     let p = data.projects[index];
@@ -20,11 +20,18 @@ const getAllProjects = (baseUrl, projectsEl) => {
                     labelEl.appendChild(document.createElement('br'));
                     projectsEl.appendChild(labelEl);
                 }
-
             });
         })
         .catch(e => {
-            // TODO
+
+            projectsEl.innerHTML = '';
+
+            let reloadEl = document.createElement('button');
+            reloadEl.textContent = 'Fetch projects';
+            reloadEl.onclick = () => {
+                getAllProjects(baseUrl, projectsEl);
+            };
+            projectsEl.appendChild(reloadEl);
         });
 };
 
@@ -41,9 +48,7 @@ const addNewProjectsPanel = (baseUrl, projects) => {
     containerEl.appendChild(headingEl);
     containerEl.appendChild(projectsEl);
 
-    setTimeout(() => {
-        getAllProjects(baseUrl, projectsEl);
-    }, 0);
+    getAllProjects(baseUrl, projectsEl);
 };
 
 const loadSettings = () => {

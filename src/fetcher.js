@@ -63,3 +63,10 @@ class Fetcher {
             });
     }
 }
+
+class FetcherUtils {
+
+    static async fetchAllProjects(baseUrl) {
+        return window.fetch(baseUrl + '/api/projects', SCRAPBOX_FETCH_OPTIONS);
+    }
+}
