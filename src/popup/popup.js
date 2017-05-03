@@ -57,6 +57,22 @@ watchPages.forEach(page => {
 
 });
 
+let markEl = document.createElement('button');
+markEl.textContent = 'Mark as read';
+markEl.onclick = () => {
+    markEl.disabled = true;
+    watchPages.forEach(page => {
+        background.notifyWatchPageAccessed(page.baseUrl, page.project, page.title, new Date().getTime() / 1000);
+    });
+    setTimeout(() => {
+        watchPagesEl.innerHTML = '';
+        setTimeout(() => {
+            window.close();
+        }, 1000);
+    }, 1000);
+};
+watchPagesEl.prepend(markEl);
+
 setTimeout(() => {
     menuItems[0].click();
     menuItems[0].blur();
