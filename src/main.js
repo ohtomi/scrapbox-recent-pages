@@ -185,20 +185,17 @@ function getRecentPages() {
 
 function resetFetchTimer() {
 
+    fetchers.forEach(fetcher => {
+        fetcher.stop();
+    });
+
+    fetchers = [];
+
     settings.sites.forEach(site => {
         site.projects.forEach(project => {
-
-            let fetcher = fetchers.find((element, index, array) => {
-                return element.baseUrl === site.baseUrl && element.project === project;
-            });
-
-            if (fetcher) {
-                fetcher.stop();
-                fetcher.doFetch(0, 300, []); // TODO
-            } else {
-                fetcher = Fetcher.start(site.baseUrl, project, settings.checkIntervalSec);
-                fetchers.push(fetcher);
-            }
+            let fetcher = new Fetcher(site.baseUrl, project, settings.checkIntervalSec);
+            fetcher.start();
+            fetchers.push(fetcher);
         });
     });
 }
