@@ -91,14 +91,6 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
     if (linkCountType === 'total') {
 
         return fetchCaches
-            .map(cache => {
-                return cache.pages.slice(0, maxLinks).map(page => {
-                    return {baseUrl: cache.baseUrl, project: cache.project, title: page.title, updated: page.updated};
-                });
-            })
-            .reduce((a, b) => {
-                return a.concat(b);
-            })
             .sort((a, b) => {
                 return b.updated - a.updated;
             })
@@ -107,34 +99,24 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
     } else if (linkCountType === 'host') {
 
         return fetchCaches
-            .map(cache => {
-                return cache.pages.slice(0, maxLinks).map(page => {
-                    return {baseUrl: cache.baseUrl, project: cache.project, title: page.title, updated: page.updated};
+            .reduce((hosts, cache) => {
+                let host = hosts.find((element, index, array) => {
+                    return element.baseUrl === cache.baseUrl;
                 });
-            })
-            .reduce((a, b) => {
-                return a.concat(b);
-            })
-            .sort((a, b) => {
-                return b.updated - a.updated;
-            })
-            .reduce((a, b) => {
-                let bag = a.find((element, index, array) => {
-                    return element.baseUrl === b.baseUrl;
-                });
-
-                if (bag) {
-                    bag.items.push(b);
+                if (!host) {
+                    host = {baseUrl: cache.baseUrl, pages: [cache]};
+                    hosts.push(host);
                 } else {
-                    bag = {baseUrl: b.baseUrl, items: [b]};
-                    a.push(bag);
+                    host.pages.push(cache);
                 }
-                return a;
+                return hosts;
             }, [])
-            .map(c => {
-                return c.items.slice(0, maxLinks).map(item => {
-                    return {baseUrl: item.baseUrl, project: item.project, title: item.title}
-                });
+            .map(host => {
+                return host.pages
+                    .sort((a, b) => {
+                        return b.updated - a.updated;
+                    })
+                    .slice(0, maxLinks);
             })
             .reduce((a, b) => {
                 return a.concat(b);
@@ -143,10 +125,24 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
     } else if (linkCountType === 'project') {
 
         return fetchCaches
-            .map(cache => {
-                return cache.pages.slice(0, maxLinks).map(page => {
-                    return {baseUrl: cache.baseUrl, project: cache.project, title: page.title};
+            .reduce((projects, cache) => {
+                let project = projects.find((element, index, array) => {
+                    return element.baseUrl === cache.baseUrl && element.project === cache.project;
                 });
+                if (!project) {
+                    project = {baseUrl: cache.baseUrl, project: cache.project, pages: [cache]};
+                    projects.push(project);
+                } else {
+                    project.pages.push(cache);
+                }
+                return projects;
+            }, [])
+            .map(project => {
+                return project.pages
+                    .sort((a, b) => {
+                        return b.updated - a.updated;
+                    })
+                    .slice(0, maxLinks);
             })
             .reduce((a, b) => {
                 return a.concat(b);
@@ -158,45 +154,51 @@ function filterRecentPages(fetchCaches, maxLinks, linkCountType) {
 let watchCaches = [];
 
 function getRecentPages() {
-    let fetchCaches = fetchers.map(fetcher => {
+    let fetchCaches = fetchers
+        .map(fetcher => {
 
-        // TODO
-        fetcher.cache.forEach(page => {
-            let watch = settings.watches.find((element, index, array) => {
-                return element.baseUrl === baseUrl && element.project === project && element.title === page.title;
-            });
-            if (!watch) {
-                return;
-            }
+            // TODO
+            fetcher.cache.forEach(page => {
+                let watch = settings.watches.find((element, index, array) => {
+                    return element.baseUrl === baseUrl && element.project === project && element.title === page.title;
+                });
+                if (!watch) {
+                    return;
+                }
 
-            let wcache = watchCaches.find((element, index, array) => {
-                return element.baseUrl === baseUrl && element.project === project && element.pages.length === 1 && element.pages[0].title === page.title;
-            });
+                let wcache = watchCaches.find((element, index, array) => {
+                    return element.baseUrl === baseUrl && element.project === project && element.pages.length === 1 && element.pages[0].title === page.title;
+                });
 
-            if (watch.accessed < page.updated) {
-                if (!wcache) {
-                    wcache = {baseUrl: baseUrl, project: project, pages: [page]};
-                    watchCaches.push(wcache);
+                if (watch.accessed < page.updated) {
+                    if (!wcache) {
+                        wcache = {baseUrl: baseUrl, project: project, pages: [page]};
+                        watchCaches.push(wcache);
+                    } else {
+                        wcache.pages = [page];
+                    }
                 } else {
-                    wcache.pages = [page];
+                    if (wcache) {
+                        watchCaches = watchCaches.filter((element, index, array) => {
+                            return element.baseUrl !== wcache.baseUrl || element.project !== wcache.project || element.pages.length !== 1 || element.pages[0].title !== wcache.pages[0].title;
+                        })
+                    }
                 }
+            });
+
+            if (watchCaches.length) {
+                chrome.browserAction.setBadgeText({text: watchCaches.length + ''});
             } else {
-                if (wcache) {
-                    watchCaches = watchCaches.filter((element, index, array) => {
-                        return element.baseUrl !== wcache.baseUrl || element.project !== wcache.project || element.pages.length !== 1 || element.pages[0].title !== wcache.pages[0].title;
-                    })
-                }
+                chrome.browserAction.setBadgeText({text: ''});
             }
+
+            return fetcher.cache.map(page => {
+                return {baseUrl: fetcher.baseUrl, project: fetcher.project, title: page.title, image: page.image, updated: page.updated};
+            });
+        })
+        .reduce((a, b) => {
+            return a.concat(b);
         });
-
-        if (watchCaches.length) {
-            chrome.browserAction.setBadgeText({text: watchCaches.length + ''});
-        } else {
-            chrome.browserAction.setBadgeText({text: ''});
-        }
-
-        return {baseUrl: fetcher.baseUrl, project: fetcher.project, pages: fetcher.cache};
-    });
     return filterRecentPages(fetchCaches, settings.maxLinks, settings.linkCountType);
 }
 
@@ -281,7 +283,7 @@ function notifyWatchPageAccessed(baseUrl, project, title, accessed) {
 
 //
 
-if (chrome) {
+if (chrome.storage) {
     Settings.load().then(s => {
         settings = s;
         resetFetchTimer();
