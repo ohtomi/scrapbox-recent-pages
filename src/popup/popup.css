@@ -40,3 +40,22 @@ body {
 .menu-content div:hover {
     background-color: #efefef;
 }
+
+#recent-pages div,
+#watch-pages div{
+    padding: 3px;
+}
+
+#recent-pages img,
+#watch-pages img {
+    height: 14px;
+    object-fit: contain;
+    margin-left: 5px;
+    margin-bottom: -3px;
+}
+
+#recent-pages span,
+#watch-pages span {
+    color: darkgray;
+    margin-right: 10px;
+}

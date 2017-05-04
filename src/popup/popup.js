@@ -25,6 +25,8 @@ recentPagesEl.innerHTML = '';
 let recentPages = background.getRecentPages();
 recentPages.forEach(page => {
 
+    let wrapperEl = document.createElement('div');
+
     let linkEl = document.createElement('a');
     linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
     linkEl.target = '_blank';
@@ -32,8 +34,24 @@ recentPages.forEach(page => {
     linkEl.onclick = () => {
         background.notifyWatchPageAccessed(page.baseUrl, page.project, page.title, new Date().getTime() / 1000);
     };
-    let wrapperEl = document.createElement('div');
     wrapperEl.appendChild(linkEl);
+
+    if (page.image) {
+        let imageEl = document.createElement('img');
+        imageEl.src = page.image;
+        wrapperEl.appendChild(imageEl);
+    }
+
+    wrapperEl.appendChild(document.createElement('br'));
+
+    let projectEl = document.createElement('span');
+    projectEl.textContent = page.project;
+    wrapperEl.appendChild(projectEl);
+
+    let updatedEl = document.createElement('span');
+    updatedEl.textContent = new Date(page.updated * 1000).toLocaleString();
+    wrapperEl.appendChild(updatedEl);
+
     recentPagesEl.appendChild(wrapperEl);
 
 });
@@ -44,6 +62,8 @@ watchPagesEl.innerHTML = '';
 let watchPages = background.getWatchPages();
 watchPages.forEach(page => {
 
+    let wrapperEl = document.createElement('div');
+
     let linkEl = document.createElement('a');
     linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
     linkEl.target = '_blank';
@@ -51,8 +71,24 @@ watchPages.forEach(page => {
     linkEl.onclick = () => {
         background.notifyWatchPageAccessed(page.baseUrl, page.project, page.title, new Date().getTime() / 1000);
     };
-    let wrapperEl = document.createElement('div');
     wrapperEl.appendChild(linkEl);
+
+    if (page.image) {
+        let imageEl = document.createElement('img');
+        imageEl.src = page.image;
+        wrapperEl.appendChild(imageEl);
+    }
+
+    wrapperEl.appendChild(document.createElement('br'));
+
+    let projectEl = document.createElement('span');
+    projectEl.textContent = page.project;
+    wrapperEl.appendChild(projectEl);
+
+    let updatedEl = document.createElement('span');
+    updatedEl.textContent = new Date(page.updated * 1000).toLocaleString();
+    wrapperEl.appendChild(updatedEl);
+
     watchPagesEl.appendChild(wrapperEl);
 
 });
