@@ -15,8 +15,8 @@ const createContextMenu = () => {
 
         let checked = info.checked;
         let baseUrl = targetUrl.origin;
-        let project = decodeURI(pathnameTokens[1]);
-        let title = decodeURI(pathnameTokens[2]);
+        let project = decodeURIComponent(pathnameTokens[1]);
+        let title = decodeURIComponent(pathnameTokens[2]);
         let accessed = new Date().getTime() / 1000;
 
         if (checked) {
@@ -46,8 +46,8 @@ const createContextMenu = () => {
         }
 
         let baseUrl = currentUrl.origin;
-        let project = decodeURI(pathnameTokens[1]);
-        let title = decodeURI(pathnameTokens[2]);
+        let project = decodeURIComponent(pathnameTokens[1]);
+        let title = decodeURIComponent(pathnameTokens[2]);
         let accessed = new Date().getTime() / 1000;
 
         let watch = settings.watches.find((element, index, array) => {
