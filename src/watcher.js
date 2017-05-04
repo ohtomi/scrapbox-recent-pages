@@ -55,7 +55,5 @@ class Watcher {
         });
 
         this.callbackRef(this.cache.length);
-
     }
-
 }

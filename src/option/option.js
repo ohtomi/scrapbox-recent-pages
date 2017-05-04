@@ -12,8 +12,7 @@ const getAllProjects = (baseUrl, projectsEl) => {
 
                 projectsEl.innerHTML = '';
 
-                for (index in data.projects) {
-                    let p = data.projects[index];
+                data.projects.forEach(p => {
                     let checkboxEl = document.createElement('input');
                     checkboxEl.type = 'checkbox';
                     checkboxEl.name = 'projects';
@@ -31,8 +30,9 @@ const getAllProjects = (baseUrl, projectsEl) => {
                     labelEl.appendChild(checkboxEl);
                     labelEl.append(p.displayName);
                     labelEl.appendChild(document.createElement('br'));
+
                     projectsEl.appendChild(labelEl);
-                }
+                });
             });
         })
         .catch(e => {
