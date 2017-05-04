@@ -2,6 +2,10 @@ const getAllProjects = (baseUrl, projectsEl) => {
 
     let background = chrome.extension.getBackgroundPage();
 
+    let site = background.getSites().find((element, index, array) => {
+        return element.baseUrl === baseUrl;
+    });
+
     background.getAllProjects(baseUrl)
         .then(res => {
             res.json().then(data => {
@@ -14,6 +18,15 @@ const getAllProjects = (baseUrl, projectsEl) => {
                     checkboxEl.type = 'checkbox';
                     checkboxEl.name = 'projects';
                     checkboxEl.value = p.name;
+
+                    checkboxEl.checked = site.projects
+                        .map(name => {
+                            return name === p.name;
+                        })
+                        .reduce((a, b) => {
+                            return a || b;
+                        }, false);
+
                     let labelEl = document.createElement('label');
                     labelEl.appendChild(checkboxEl);
                     labelEl.append(p.displayName);
