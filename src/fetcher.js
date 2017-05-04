@@ -3,10 +3,11 @@ const SCRAPBOX_FETCH_OPTIONS = {credentials: 'include', mode: 'cors'};
 
 class Fetcher {
 
-    constructor(baseUrl, project, checkIntervalSec) {
+    constructor(baseUrl, project, checkIntervalSec, forWatchOnly) {
         this.baseUrl = baseUrl;
         this.project = project;
         this.checkIntervalSec = checkIntervalSec;
+        this.forWatchOnly = forWatchOnly;
 
         this._timer = null;
         this._fetching = false;

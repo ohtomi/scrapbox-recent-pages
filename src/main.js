@@ -79,6 +79,22 @@ const resetFetchTimer = () => {
             fetchers.push(fetcher);
         });
     });
+    settings.watches.forEach(watch => {
+        let baseUrl = watch.baseUrl;
+        let project = watch.project;
+
+        let fetcher = fetchers.find((element, index, array) => {
+            return element.baseUrl === baseUrl && element.project === project;
+        });
+
+        if (fetcher) {
+            return;
+        }
+
+        fetcher = new Fetcher(watch.baseUrl, watch.project, settings.checkIntervalSec, true);
+        fetcher.start();
+        fetchers.push(fetcher);
+    });
 
     if (watcher) {
         watcher.stop();
@@ -180,7 +196,11 @@ function filterRecentPages(allPages, maxLinks, linkCountType) {
 function getRecentPages() {
     let allPages = fetchers
         .map(fetcher => {
-            return fetcher.cache;
+            if (fetcher.forWatchOnly) {
+                return [];
+            } else {
+                return fetcher.cache;
+            }
         })
         .reduce((a, b) => {
             return a.concat(b);
