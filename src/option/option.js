@@ -71,6 +71,14 @@ const loadSettings = () => {
     let checkIntervalSecEl = document.querySelector('#check-interval-sec');
     checkIntervalSecEl.value = checkIntervalSec;
 
+    let openTabType = background.getOpenTabType();
+    let openTabTypeEls = document.querySelectorAll('input[name="open-tab-type"]');
+    openTabTypeEls.forEach(openTabTypeEl => {
+        if (openTabTypeEl.value === openTabType) {
+            openTabTypeEl.checked = true;
+        }
+    });
+
     let sites = background.getSites();
     sites.forEach(site => {
         addNewProjectsPanel(site.baseUrl, site.projects);
@@ -97,6 +105,13 @@ const saveSettings = () => {
     if (checkIntervalSecEl.value) {
         background.updateCheckIntervalSec(checkIntervalSecEl.value);
     }
+
+    let openTabTypeEls = document.querySelectorAll('input[name="open-tab-type"]');
+    openTabTypeEls.forEach(openTabTypeEl => {
+        if (openTabTypeEl.checked) {
+            background.updateOpenTabType(openTabTypeEl.value);
+        }
+    });
 
     let sites = [];
 

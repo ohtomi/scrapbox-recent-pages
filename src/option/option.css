@@ -12,7 +12,11 @@ h3 {
     border-radius: 5px;
 }
 
-#links-to-recent-pages input[type="radio"] {
+#general div {
+    margin-bottom: 5px;
+}
+
+#general input[type="radio"] {
     margin-left: 5px;
     margin-right: 3px;
 }

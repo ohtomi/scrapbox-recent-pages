@@ -224,6 +224,15 @@ function updateCheckIntervalSec(value) {
     })
 }
 
+function getOpenTabType() {
+    return settings.openTabType;
+}
+
+function updateOpenTabType(value) {
+    settings.openTabType = value;
+    settings.save();
+}
+
 function getSites() {
     return settings.sites;
 }

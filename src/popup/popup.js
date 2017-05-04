@@ -110,6 +110,10 @@ markEl.onclick = () => {
 watchPagesEl.prepend(markEl);
 
 setTimeout(() => {
-    menuItems[0].click();
+    if (background.getOpenTabType() === 'recent-pages') {
+        menuItems[0].click();
+    } else if (background.getOpenTabType() === 'watch-pages') {
+        menuItems[1].click();
+    }
     menuItems[0].blur();
 }, 30);

@@ -6,8 +6,8 @@
     <title>Scrapbox Recent Pages</title>
 </head>
 <body>
-<h3>Links to recent pages</h3>
-<div id="links-to-recent-pages" class="panel">
+<h3>General</h3>
+<div id="general" class="panel">
     <div>
         <span>Max Links: </span><input id="max-links" type="number" value="30" min="1" max="100"></input>
         <label><input type="radio" name="link-count-type" value="total" checked>Total</label>
@@ -16,6 +16,11 @@
     </div>
     <div>
         <span>Check Interval (sec): </span><input id="check-interval-sec" type="number" value="60" min="60" max="3600"></input>
+    </div>
+    <div>
+        <span>Open Tab: </span>
+        <label><input type="radio" name="open-tab-type" value="recent-pages" checked>Recent Pages</label>
+        <label><input type="radio" name="open-tab-type" value="watch-pages">Watch Pages</label>
     </div>
 </div>
 <div id="projects-container">
