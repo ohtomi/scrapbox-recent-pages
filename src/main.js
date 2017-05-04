@@ -38,29 +38,42 @@ const createContextMenu = () => {
         documentUrlPatterns: contextMenuAvailableUrlPatterns
     });
 
-    chrome.runtime.onMessage.addListener((req, sender, callback) => {
-        let currentUrl = new URL(req.pageUrl);
-        let pathnameTokens = currentUrl.pathname.split('/');
+    let notifier = (pageUrl, contextMenuUpdater) => {
+        if (!pageUrl) {
+            return;
+        }
+
+        let targetUrl = new URL(pageUrl);
+        let pathnameTokens = targetUrl.pathname.split('/');
         if (pathnameTokens.length !== 3 || pathnameTokens[1] === '' || pathnameTokens[2] === '') {
             return;
         }
 
-        let baseUrl = currentUrl.origin;
+        let baseUrl = targetUrl.origin;
         let project = decodeURIComponent(pathnameTokens[1]);
         let title = decodeURIComponent(pathnameTokens[2]);
         let accessed = new Date().getTime() / 1000;
 
-        let watch = settings.watches.find((element, index, array) => {
-            return element.baseUrl === baseUrl && element.project === project && element.title === title;
-        });
-
-        chrome.contextMenus.update('watch-this-page', {
-            checked: watch != null
-        }, () => {
-            callback();
-        });
-
         notifyWatchPageAccessed(baseUrl, project, title, accessed);
+
+        if (contextMenuUpdater) {
+            contextMenuUpdater(baseUrl, project, title);
+        }
+    };
+
+    chrome.runtime.onMessage.addListener((req, sender, callback) => {
+        notifier(req.leftPageUrl);
+        notifier(req.currentPageUrl, (baseUrl, project, title) => {
+            let watch = settings.watches.find((element, index, array) => {
+                return element.baseUrl === baseUrl && element.project === project && element.title === title;
+            });
+
+            chrome.contextMenus.update('watch-this-page', {
+                checked: watch != null
+            }, () => {
+                callback();
+            });
+        });
     });
 };
 

@@ -1,9 +1,17 @@
-setInterval(() => {
+let currentPageUrl = null;
 
-    let msg = {
-        pageUrl: location.href
+let observer = new MutationObserver(() => {
+    if (location.href === currentPageUrl) {
+        return;
+    }
+
+    let message = {
+        leftPageUrl: currentPageUrl,
+        currentPageUrl: location.href
     };
-    chrome.runtime.sendMessage(chrome.runtime.id, msg, (res) => {
+    chrome.runtime.sendMessage(chrome.runtime.id, message, () => {
     });
+    currentPageUrl = location.href;
+});
 
-}, 30000); // TODO
+observer.observe(document.body, {childList: true, subtree: true});
