@@ -116,6 +116,8 @@ const saveSettings = () => {
     if (sites.length) {
         background.updateSites(sites);
     }
+
+    window.close();
 };
 
 //
