@@ -64,6 +64,31 @@ const addNewProjectsPanel = (baseUrl, projects) => {
     getAllProjects(baseUrl, projectsEl);
 };
 
+const addWatchItems = (watches) => {
+
+    let background = chrome.extension.getBackgroundPage();
+
+    let panelEl = document.querySelector('#watches');
+    panelEl.innerHTML = '';
+
+    watches
+        .sort((a, b) => {
+            return a.title.localeCompare(b.title);
+        })
+        .forEach(watch => {
+            let wrapperEl = document.createElement('div');
+
+            wrapperEl.appendChild(document.createTextNode('\u2714 '))
+
+            let titleEl = document.createElement('span');
+            titleEl.textContent = watch.title;
+            titleEl.title = '[' + watch.project + '] ' + watch.title;
+            wrapperEl.appendChild(titleEl);
+
+            panelEl.appendChild(wrapperEl);
+        });
+};
+
 const loadSettings = () => {
 
     let background = chrome.extension.getBackgroundPage();
@@ -96,6 +121,11 @@ const loadSettings = () => {
     sites.forEach(site => {
         addNewProjectsPanel(site.baseUrl, site.projects);
     });
+
+    let watches = background.getWatches();
+    if (watches.length) {
+        addWatchItems(watches);
+    }
 };
 
 const saveSettings = () => {

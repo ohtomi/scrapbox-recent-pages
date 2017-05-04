@@ -1,3 +1,8 @@
+body {
+    min-width: 400px;
+    min-height: 200px;
+}
+
 h3 {
     color: darkviolet;
     margin-bottom: 5px;
@@ -12,6 +17,11 @@ h3 {
     border-radius: 5px;
 }
 
+.note-that {
+    color: orangered;
+    font-weight: bold;
+}
+
 #general div {
     margin-bottom: 5px;
 }
@@ -23,6 +33,13 @@ h3 {
 
 #projects-container input[type="checkbox"] {
     margin: 0 3px 3px 0;
+}
+
+#watches div {
+    width: 390px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #controller {
