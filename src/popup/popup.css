@@ -34,28 +34,21 @@ body {
 }
 
 .menu-content div {
-    margin: 3px 3px;
+    padding: 3px;
 }
 
 .menu-content div:hover {
     background-color: #efefef;
 }
 
-#recent-pages div,
-#watch-pages div{
-    padding: 3px;
-}
-
-#recent-pages img,
-#watch-pages img {
+.menu-content img {
     height: 14px;
     object-fit: contain;
     margin-left: 5px;
     margin-bottom: -3px;
 }
 
-#recent-pages span,
-#watch-pages span {
+.menu-content span {
     color: darkgray;
     margin-right: 10px;
 }

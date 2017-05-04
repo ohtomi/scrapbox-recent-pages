@@ -28,7 +28,7 @@ recentPages.forEach(page => {
     let wrapperEl = document.createElement('div');
 
     let linkEl = document.createElement('a');
-    linkEl.href = page.baseUrl + '/' + page.project + '/' + page.title;
+    linkEl.href = page.baseUrl + '/' + encodeURIComponent(page.project) + '/' + encodeURIComponent(page.title);
     linkEl.target = '_blank';
     linkEl.textContent = page.title;
     linkEl.onclick = () => {
