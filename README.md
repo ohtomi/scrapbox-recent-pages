@@ -4,6 +4,10 @@ This is a browser extension to watch Scrapbox pages.
 
 ## Usage
 
+<img src="docs/popup.gif">
+
+<img src="docs/option.png" width="400px">
+
 ### Recent Pages
 
 This tab shows links to recently updated pages of specified projects.
@@ -14,7 +18,7 @@ This tab shows links to unread pages that were updated after you had visited.
 
 ### Scrapbox Enterprise
 
-To watch Scrapbox Enterprise, configure `src/manifest.json` and `src/main.js`.
+To watch Scrapbox Enterprise, configure `src/manifest.json` and `src/settings.js`.
 
 ```json
 {
@@ -22,20 +26,35 @@ To watch Scrapbox Enterprise, configure `src/manifest.json` and `src/main.js`.
   "permissions": [
     "https://scrapbox.io/*/*",
     "https://YOUR-HOST/*/*",
+    "contextMenus",
     "storage",
     "cookies"
   ],
   ...
+  "content_scripts": [
+    {
+      "matches": [
+        "https://scrapbox.io/*",
+        "https://YOUR-HOST/*"
+      ],
+      ...
+    }
+  ],
 }
 ```
 
 ```javascript
-var settings = {
+class Settings {
+
+    constructor(settings) {
+        ...
+        this.sites = settings.sites || [
+            {baseUrl: 'https://scrapbox.io', projects: []},
+            {baseUrl: 'https://YOUR-HOST', projects: []}
+        ];
+        ...
+    }
     ...
-    sites: [
-        {baseUrl: 'https://scrapbox.io', projects: []},
-        {baseUrl: 'https://YOUR-HOST', projects: []}
-    ]
 };
 ```
 
